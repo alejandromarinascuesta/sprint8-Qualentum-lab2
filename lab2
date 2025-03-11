@@ -1,27 +1,41 @@
 # Cargar las librerías necesarias
 library(ggplot2)
+library(forecast)
+library(tseries)
 
-# Cargar los datos de la serie temporal
-# Aquí debes poner la ruta de tu archivo de datos
-serie_temporal <- read.csv("ruta/a/tu/archivo.csv")
+# 1. Cargar y explorar el dataset 'AirPassengers'
+data("AirPassengers")  # Cargar el dataset incluido en R
 
-# Visualizar las primeras filas de los datos para comprender su estructura
-head(serie_temporal)
+# Mostrar las primeras filas de los datos
+head(AirPassengers)
 
-# Verificar la estructura de los datos (tipos de variables)
-str(serie_temporal)
+# Verificar la estructura de los datos
+str(AirPassengers)
 
 # Graficar la serie temporal
-ggplot(serie_temporal, aes(x = Fecha, y = Valor)) +
-  geom_line() +
-  labs(title = "Visualización de la Serie Temporal", x = "Fecha", y = "Valor") +
+autoplot(AirPassengers) +
+  labs(title = "Serie Temporal de Pasajeros Aéreos", x = "Fecha", y = "Número de Pasajeros") +
   theme_minimal()
 
-# Si la fecha no está en formato adecuado, convertirla:
-serie_temporal$Fecha <- as.Date(serie_temporal$Fecha, format="%Y-%m-%d")
+# 2. Descomponer la serie temporal en sus componentes
+# Decomponer la serie temporal utilizando la función 'decompose()'
+decomposed_airpassengers <- decompose(AirPassengers, type = "multiplicative")
 
-# Graficar de nuevo después de la conversión de la fecha
-ggplot(serie_temporal, aes(x = Fecha, y = Valor)) +
-  geom_line() +
-  labs(title = "Serie Temporal - Gráfico con Fechas Correctas", x = "Fecha", y = "Valor") +
-  theme_minimal()
+# Graficar los componentes (tendencia, estacionalidad y aleatorio)
+plot(decomposed_airpassengers)
+
+# 3. Análisis de estacionariedad
+# Graficar los gráficos de autocorrelación (ACF y PACF)
+acf(AirPassengers)
+pacf(AirPassengers)
+
+# Aplicar la prueba de Dickey-Fuller para verificar la estacionariedad
+adf.test(AirPassengers)
+
+# 4. Detección de valores atípicos con un boxplot
+# Realizar un boxplot para detectar valores atípicos
+boxplot(AirPassengers, main = "Detección de Valores Atípicos en la Serie Temporal", 
+        ylab = "Número de Pasajeros", col = "lightblue")
+
+# 5. Conclusión
+# El código anterior descompone la serie temporal en sus componentes, verifica la estacionariedad y detecta valores atípicos.
